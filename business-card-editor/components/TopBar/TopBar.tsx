@@ -11,6 +11,33 @@ const TopBar: React.FC<TopBarProps> = ({ projectId }) => {
   const undo = useEditorStore(state => state.undo);
   const redo = useEditorStore(state => state.redo);
   const saveToServer = useEditorStore(state => state.saveToServer);
+  const updateProjectName = useEditorStore(state => state.updateProjectName);
+
+  const [editing, setEditing] = React.useState(false);
+  const ref = React.useRef<HTMLHeadingElement | null>(null);
+
+  const onFocus = () => {
+    setEditing(true);
+    // select text
+    requestAnimationFrame(() => {
+      const el = ref.current as HTMLElement | null;
+      if (!el) return;
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    });
+  };
+
+  const commit = async (newName: string) => {
+    const nameTrim = newName.trim() || 'Untitled';
+    if (nameTrim === (project?.name || '')) return;
+    updateProjectName(nameTrim);
+    await saveToServer();
+  };
 
   return (
     <div style={{
@@ -25,7 +52,33 @@ const TopBar: React.FC<TopBarProps> = ({ projectId }) => {
       gap: '24px',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <h1 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>{project?.name || 'Editor'}</h1>
+        <h1
+          ref={ref}
+          contentEditable
+          suppressContentEditableWarning
+          onFocus={onFocus}
+          onBlur={async (e) => {
+            setEditing(false);
+            const text = e.currentTarget.textContent || '';
+            await commit(text);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              (e.target as HTMLElement).blur();
+            }
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              // revert
+              const el = ref.current;
+              if (el) el.textContent = project?.name || 'Editor';
+              (e.target as HTMLElement).blur();
+            }
+          }}
+          style={{ fontSize: '18px', fontWeight: 600, margin: 0, outline: editing ? '2px solid rgba(11,118,255,0.15)' : 'none', padding: '2px 6px', borderRadius: 4 }}
+        >
+          {project?.name || 'Editor'}
+        </h1>
       </div>
 
       <div style={{ display: 'flex', gap: '8px' }}>

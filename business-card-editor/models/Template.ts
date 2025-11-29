@@ -24,6 +24,6 @@ const TemplateSchema = new Schema<ITemplateDocument>({
   metadata: { type: Schema.Types.Mixed, default: {} },
 });
 
-TemplateSchema.index({ category: 1 });
+// category index declared inline on the field; no extra index() call to avoid duplication
 
 export default model<ITemplateDocument>('Template', TemplateSchema);

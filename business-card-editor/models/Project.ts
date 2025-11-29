@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import mongoose, { Schema, model, Document, Model } from "mongoose";
 import { ElementSchema, IElement } from "./Element";
 
 export interface IPage {
@@ -56,10 +56,19 @@ const ProjectSchema = new Schema<IProjectDocument>(
     },
     pagesCount: { type: Number, default: 1 },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    // Force the MongoDB collection name to `swoocards` so we don't write to the
+    // default `test` database/collection when a DB name isn't supplied in the URI.
+    collection: "swoocards",
+  }
 );
 
-ProjectSchema.index({ userId: 1 });
-ProjectSchema.index({ status: 1 });
+// `userId` and `status` already declare `index: true` on their fields above.
+// Avoid calling schema.index() again to prevent duplicate-index warnings from Mongoose.
 
-export default model<IProjectDocument>("Project", ProjectSchema);
+const ProjectModel: Model<IProjectDocument> =
+  (mongoose.models && (mongoose.models.Project as Model<IProjectDocument>)) ||
+  model<IProjectDocument>("Project", ProjectSchema);
+
+export default ProjectModel;

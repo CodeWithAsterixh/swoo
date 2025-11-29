@@ -11,14 +11,26 @@ export interface IElement {
   size: { width: number; height: number };
   rotation: number;
   style?: {
+    // text styles
+    fontFamily?: string;
     fontSize?: number;
+    fontStyle?: 'normal' | 'italic' | 'oblique';
+    fontWeight?: string | number;
+    textAlign?: 'left' | 'center' | 'right' | 'justify';
+    lineHeight?: number;
+    letterSpacing?: number;
+    textDecoration?: 'none' | 'underline' | 'line-through';
     color?: string;
-    border?: string;
+
+    // border / stroke
+    stroke?: string;
+    strokeWidth?: number;
+
+    // box styles
+    borderRadius?: number;
     // shape-specific
     shape?: 'rect' | 'oval' | 'line';
     fill?: string;
-    stroke?: string;
-    strokeWidth?: number;
   };
   parentId?: string | null;
   zIndex: number;

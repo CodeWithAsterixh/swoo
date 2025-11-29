@@ -20,10 +20,23 @@ const Canvas: React.FC<CanvasProps> = () => {
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const draggingRef = useRef<{ elementId: string; startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const resizingRef = useRef<{
+    elementId: string;
+    handle: string;
+    startX: number;
+    startY: number;
+    origX: number;
+    origY: number;
+    origW: number;
+    origH: number;
+    origRotation: number;
+  } | null>(null);
   
   const pending = useEditorStore(state => state.pendingElement);
   const placePending = useEditorStore(state => state.placePending);
   const cancelPlacement = useEditorStore(state => state.cancelPlacement);
+  const snapToGrid = useEditorStore(state => state.snapToGrid);
+  const gridSize = useEditorStore(state => state.gridSize);
   
   const placingRef = useRef<{ startX: number; startY: number; dragging: boolean } | null>(null);
   const [preview, setPreview] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
@@ -40,6 +53,75 @@ const Canvas: React.FC<CanvasProps> = () => {
 
   useEffect(() => {
     function onPointerMove(e: PointerEvent) {
+      const r = resizingRef.current;
+      if (r) {
+        // handle resize
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const dx = e.clientX - r.startX;
+        const dy = e.clientY - r.startY;
+        let newX = r.origX;
+        let newY = r.origY;
+        let newW = r.origW;
+        let newH = r.origH;
+        const minSize = 8;
+        switch (r.handle) {
+          case 'nw':
+            newX = r.origX + dx;
+            newY = r.origY + dy;
+            newW = r.origW - dx;
+            newH = r.origH - dy;
+            break;
+          case 'n':
+            newY = r.origY + dy;
+            newH = r.origH - dy;
+            break;
+          case 'ne':
+            newY = r.origY + dy;
+            newW = r.origW + dx;
+            newH = r.origH - dy;
+            break;
+          case 'e':
+            newW = r.origW + dx;
+            break;
+          case 'se':
+            newW = r.origW + dx;
+            newH = r.origH + dy;
+            break;
+          case 's':
+            newH = r.origH + dy;
+            break;
+          case 'sw':
+            newX = r.origX + dx;
+            newW = r.origW - dx;
+            newH = r.origH + dy;
+            break;
+          case 'w':
+            newX = r.origX + dx;
+            newW = r.origW - dx;
+            break;
+          case 'rotate':
+            // compute center and angle
+            const el = page?.elements.find(el => el.id === r.elementId);
+            if (!el) break;
+            const centerX = rect.left + (el.position.x + el.size.width / 2);
+            const centerY = rect.top + (el.position.y + el.size.height / 2);
+            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
+            // apply rotation
+            useEditorStore.getState().updateElement(page?.id ?? '', r.elementId, { rotation: Math.round(angle) } as any);
+            return;
+        }
+
+        if (newW < minSize) newW = minSize;
+        if (newH < minSize) newH = minSize;
+        // clamp to canvas bounds
+        newX = Math.max(0, Math.min(newX, rect.width - newW));
+        newY = Math.max(0, Math.min(newY, rect.height - newH));
+
+        useEditorStore.getState().updateElement(page?.id ?? '', r.elementId, { position: { x: Math.round(newX), y: Math.round(newY) }, size: { width: Math.round(newW), height: Math.round(newH) } } as any);
+        return;
+      }
+
       const d = draggingRef.current;
       if (!d) return;
       const dx = e.clientX - d.startX;
@@ -49,6 +131,7 @@ const Canvas: React.FC<CanvasProps> = () => {
 
     function onPointerUp() {
       draggingRef.current = null;
+      resizingRef.current = null;
       setIsDragging(false);
     }
 
@@ -59,6 +142,49 @@ const Canvas: React.FC<CanvasProps> = () => {
       window.removeEventListener('pointerup', onPointerUp);
     };
   }, [page, moveElement]);
+
+  // keyboard nudges for selected elements
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      // don't intercept when typing into inputs
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+
+      const selected = useEditorStore.getState().selectedElements;
+      if (!selected || selected.length === 0) return;
+
+      let dx = 0;
+      let dy = 0;
+      const step = e.shiftKey ? 10 : 1;
+      switch (e.key) {
+        case 'ArrowLeft': dx = -step; break;
+        case 'ArrowRight': dx = step; break;
+        case 'ArrowUp': dy = -step; break;
+        case 'ArrowDown': dy = step; break;
+        default: return;
+      }
+
+      e.preventDefault();
+      const pageId = selected[0].pageId;
+      if (selected.length === 1) {
+        const el = page?.elements.find(p => p.id === selected[0].elementId);
+        if (!el) return;
+        // use moveElement which respects snapping
+        useEditorStore.getState().moveElement(pageId, el.id, (el.position.x ?? 0) + dx, (el.position.y ?? 0) + dy);
+      } else {
+        // multi-select: batch update positions
+        const updates = selected.map(s => {
+          const el = page?.elements.find(p => p.id === s.elementId);
+          if (!el) return null;
+          return { pageId: s.pageId, elementId: s.elementId, patch: { position: { x: (el.position.x ?? 0) + dx, y: (el.position.y ?? 0) + dy } } };
+        }).filter(Boolean) as any[];
+        if (updates.length) useEditorStore.getState().updateElements(updates);
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [page]);
 
   // handle global pointer move for placement preview and cursor thumbnail
   useEffect(() => {
@@ -107,7 +233,8 @@ const Canvas: React.FC<CanvasProps> = () => {
       if (s) s.remove();
     }
 
-    if (pending || isDragging) {
+    // hide native cursor only when placing a pending element (we show a custom icon)
+    if (pending) {
       addHideCursorStyle();
     } else {
       removeHideCursorStyle();
@@ -182,17 +309,23 @@ const Canvas: React.FC<CanvasProps> = () => {
         placingRef.current = null;
         setPreview(null);
       }}
-      style={{
-        width: project.canvas?.width ?? 600,
-        height: project.canvas?.height ?? 350,
-        border: '2px solid #0b76ff',
-        background: project.canvas?.backgroundColor ?? '#fff',
-        position: 'relative',
-        borderRadius: '8px',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-        cursor: pending ? 'none' : 'default',
-      }}
+        style={{
+          width: project.canvas?.width ?? 600,
+          height: project.canvas?.height ?? 350,
+          border: '2px solid #0b76ff',
+          background: project.canvas?.backgroundColor ?? '#fff',
+          position: 'relative',
+          borderRadius: '8px',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+          // show grabbing cursor while actively dragging/resizing; hide native cursor only during placement
+          cursor: pending ? 'none' : isDragging ? 'grabbing' : 'default',
+        }}
     >
+      {/* grid overlay */}
+      {snapToGrid && (
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, opacity: 0.35, backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.06) 1px, transparent 1px)`, backgroundSize: `${gridSize}px ${gridSize}px` }} />
+      )}
+
       {page.elements.map((el) => (
         <ElementRenderer
           key={el.id}
@@ -208,13 +341,36 @@ const Canvas: React.FC<CanvasProps> = () => {
             // check if Shift key is pressed for multi-select
             const multiSelect = ev.shiftKey || ev.ctrlKey || ev.metaKey;
             selectElement(page?.id ?? '', el.id, multiSelect);
-            
+
+            const target = ev.target as HTMLElement;
+            const handle = target?.dataset?.handle;
             const clientX = ev.clientX;
             const clientY = ev.clientY;
+
+            if (handle) {
+              // begin resize/rotate
+              resizingRef.current = {
+                elementId: el.id,
+                handle,
+                startX: clientX,
+                startY: clientY,
+                origX: el.position?.x ?? 0,
+                origY: el.position?.y ?? 0,
+                origW: el.size?.width ?? 100,
+                origH: el.size?.height ?? 40,
+                origRotation: el.rotation ?? 0,
+              };
+              setIsDragging(true);
+              return;
+            }
+
+            // otherwise start moving
+            const clientX2 = ev.clientX;
+            const clientY2 = ev.clientY;
             draggingRef.current = {
               elementId: el.id,
-              startX: clientX,
-              startY: clientY,
+              startX: clientX2,
+              startY: clientY2,
               origX: el.position?.x ?? 0,
               origY: el.position?.y ?? 0,
             };

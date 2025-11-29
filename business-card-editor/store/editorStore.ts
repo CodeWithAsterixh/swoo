@@ -48,6 +48,9 @@ type EditorState = {
   // batch update multiple elements
   updateElements: (updates: Array<{ pageId: string; elementId: string; patch: Partial<Element> }>) => void;
 
+  // update project metadata
+  updateProjectName: (name: string) => void;
+
   saveToServer: (endpoint?: string) => Promise<Response | null>;
 };
 
@@ -351,7 +354,20 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     });
   },
 
-  saveToServer: async (endpoint = '/business-card-editor/api/projects') => {
+  updateProjectName: (name: string) => {
+    const project = get().project;
+    if (!project) return;
+    get().pushUndo();
+    set(state => {
+      const newProject = produce(state.project as ProjectType, draft => {
+        draft.name = name;
+      });
+      saveToLocalStorage(newProject);
+      return { project: newProject };
+    });
+  },
+
+  saveToServer: async (endpoint = '/api/projects') => {
     const project = get().project;
     if (!project) return null;
     
@@ -359,10 +375,30 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     saveToLocalStorage(project);
     
     try {
+      // Get token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      
+      let body: any;
+      if (project._id) {
+        // PUT: update existing project
+        body = {
+          id: project._id,
+          data: project,
+        };
+      } else {
+        // POST: create new project
+        body = project;
+      }
+      
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const res = await fetch(endpoint, {
         method: project._id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(project),
+        headers,
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         const json = await res.json();

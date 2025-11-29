@@ -1,9 +1,14 @@
 import ProjectModel from '../models/Project';
+import { Types } from 'mongoose';
 import type { ProjectType, NewElementInput } from '../types/project';
 import { generateId } from '../lib/utils';
 
-const listProjects = async (): Promise<ProjectType[]> => {
-  const docs = await ProjectModel.find().lean().exec();
+const listProjects = async (userId?: string): Promise<ProjectType[]> => {
+  const query: any = {};
+  if (userId) {
+    query.userId = userId;
+  }
+  const docs = await ProjectModel.find(query).lean().exec();
   return docs as unknown as ProjectType[];
 };
 
@@ -14,8 +19,10 @@ const getProjectById = async (id: string): Promise<ProjectType | null> => {
 
 const createProject = async (payload: Partial<ProjectType>): Promise<ProjectType> => {
   const defaultCanvas = { width: 350, height: 200, backgroundColor: '#ffffff' };
+  // Only set `userId` when it's a valid ObjectId; local/demo strings should be ignored
+  const maybeUserId = payload.userId && Types.ObjectId.isValid(String(payload.userId)) ? payload.userId : undefined;
   const project = new ProjectModel({
-    userId: payload.userId,
+    userId: maybeUserId,
     name: payload.name || 'Untitled',
     canvas: payload.canvas || defaultCanvas,
     pages: payload.pages && payload.pages.length ? payload.pages : [{ id: generateId('page_'), elements: [] }]
