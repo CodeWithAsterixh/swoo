@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
+import { initialLetters } from '@/lib/text-transform';
 
 const Navigation: React.FC = () => {
   const pathname = usePathname();
@@ -14,8 +15,7 @@ const Navigation: React.FC = () => {
   const isActive = (path: string) => pathname === path || pathname.startsWith(path + '/');
 
   const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Templates', href: '/templates' },
+    { label: 'Template', href: '/templates' },
     { label: 'Create', href: '/editor/create' },
   ];
 
@@ -26,57 +26,145 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <nav className="app-nav">
-      <Link href="/" style={{ textDecoration: 'none' }}>
-        <div className="nav-brand" aria-label="Swoo home">Swoo</div>
-      </Link>
-
-      <div style={{ flex: 1 }} />
-
-      <div className="nav-links" role="navigation" aria-label="Main navigation">
-        {isAuthenticated && navItems.map(item => (
-          <Link key={item.href} href={item.href} className={isActive(item.href) ? 'active' : ''}>
-            {item.label}
-          </Link>
-        ))}
-      </div>
-
-      <button className="nav-toggle" aria-label="Toggle menu" onClick={() => setMobileOpen(!mobileOpen)}>☰</button>
-
-      <div className="nav-actions">
-        {isAuthenticated ? (
-          <div className="nav-user-menu">
-            <button onClick={() => setShowUserMenu(!showUserMenu)} className="btn btn-ghost">{user?.name || user?.email} ▼</button>
-            {showUserMenu && (
-              <div className="nav-user-dropdown">
-                <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(11,118,255,0.06)', fontSize: 12, color: '#aaa' }}>{user?.email}</div>
-                <button onClick={handleLogout} style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: 'none', color: '#ff6b6b', textAlign: 'left', cursor: 'pointer' }}>Sign Out</button>
+    <div className="sticky mb-3 top-0 left-0 right-0 z-50 px-4 py-4">
+      <div className="mx-auto w-full max-w-6xl">
+        {/* Main Navigation Banner */}
+        <div className="bg-base-100/85 backdrop-blur-lg border border-base-300/40 rounded-full px-6 py-4 shadow-xl flex items-center justify-between">
+          
+          {/* Left: Status Badge */}
+          <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-secondary/20 text-secondary rounded-full text-xs font-semibold whitespace-nowrap">
+            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+              <div className="w-9 h-9 bg-base-content rounded-full flex items-center justify-center">
+                <span className="text-base-100 font-bold text-lg">S</span>
               </div>
-            )}
+              <span className="hidden sm:inline text-lg font-bold text-base-content">Swoo</span>
+            </Link>
           </div>
-        ) : (
-          <>
-            <Link href="/auth/login" style={{ textDecoration: 'none', color: 'inherit' }}>Sign In</Link>
-            <Link href="/auth/register" className="btn btn-primary" style={{ textDecoration: 'none' }}>Sign Up</Link>
-          </>
+
+          {/* Center: Logo + Nav Items */}
+          <div className="flex items-center gap-1 md:gap-8">
+            {/* Logo with Icon */}
+            
+
+            {/* Navigation Links - Hidden on mobile */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {navItems.map(item => (
+                <Link 
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-2 text-sm font-medium rounded-full transition-all ${
+                    isActive(item.href)
+                      ? 'bg-primary/20 text-primary'
+                      : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          {/* Right: User Actions */}
+          <div className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="px-4 py-2 rounded-full text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-all flex items-center gap-2"
+                >
+                  <span className="hidden sm:inline">{initialLetters({
+                    str:user?.name || user?.email || 'U',
+                    amount: 2,
+                    type: 'uppercase',
+                  })}</span>
+                </button>
+                
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-base-100 border border-base-300 rounded-2xl shadow-xl overflow-hidden z-50">
+                    <div className="px-4 py-3 border-b border-base-300 text-xs text-base-content/60 font-medium">
+                      {user?.email}
+                    </div>
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50/50 transition-colors font-medium"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link 
+                  href="/auth/login"
+                  className="hidden sm:inline px-4 py-2 text-sm font-medium text-base-content/70 hover:text-base-content transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  href="/auth/register"
+                  className="px-4 py-2 text-sm font-semibold rounded-full bg-primary text-primary-content hover:shadow-lg transition-all"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button 
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="lg:hidden p-2 hover:bg-base-200/50 rounded-full transition-colors"
+              aria-label="Toggle menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu - Dropdown below banner */}
+        {mobileOpen && (
+          <div className="mt-3 bg-base-100/85 backdrop-blur-lg border border-base-300/40 rounded-3xl p-4 shadow-xl lg:hidden">
+            <nav className="flex flex-col gap-2">
+              {navItems.map(item => (
+                <Link 
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${
+                    isActive(item.href)
+                      ? 'bg-primary/20 text-primary'
+                      : 'text-base-content/70 hover:bg-base-200/50'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              
+              {!isAuthenticated && (
+                <div className="flex gap-2 pt-3 border-t border-base-300/40">
+                  <Link 
+                    href="/auth/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex-1 px-4 py-3 text-center text-sm font-medium text-base-content/70 hover:bg-base-200/50 rounded-2xl transition-all"
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    href="/auth/register"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex-1 px-4 py-3 text-center text-sm font-semibold rounded-2xl bg-primary text-primary-content hover:shadow-lg transition-all"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </nav>
+          </div>
         )}
       </div>
-
-      {/* Mobile menu overlay */}
-      {mobileOpen && (
-        <div style={{ position: 'absolute', top: '64px', left: 0, right: 0, background: 'linear-gradient(135deg,#0a0e27, #13172b)', padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {navItems.map(item => (
-            <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} style={{ padding: '10px 12px', color: isActive(item.href) ? '#0b76ff' : '#ddd' }}>{item.label}</Link>
-          ))}
-          {!isAuthenticated && (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Link href="/auth/login" onClick={() => setMobileOpen(false)} style={{ padding: '8px 12px' }}>Sign In</Link>
-              <Link href="/auth/register" onClick={() => setMobileOpen(false)} className="btn btn-primary">Sign Up</Link>
-            </div>
-          )}
-        </div>
-      )}
-    </nav>
+    </div>
   );
 };
 

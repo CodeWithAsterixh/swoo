@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { decryptData } from '../../business-card-editor/lib/encryption';
-import { useRequireAuth } from '../contexts/useRequireAuth';
+import { decryptData } from '../../../business-card-editor/lib/encryption';
+import { useRequireAuth } from '../../contexts/useRequireAuth';
 
 type Template = {
   id: string;

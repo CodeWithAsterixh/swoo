@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect } from 'react';
-import Hero from './components/Hero';
-import FeatureCard from './components/FeatureCard';
-import Footer from './components/Footer';
+import Hero from '../components/Hero';
+import FeatureCard from '../components/FeatureCard';
+import Footer from '../components/Footer';
 
 export default function Home() {
   useEffect(() => {

@@ -1,12 +1,12 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Canvas from '../../../business-card-editor/components/Canvas/Canvas';
-import Toolbar from '../../../business-card-editor/components/Toolbar/Toolbar';
-import PropertiesPanel from '../../../business-card-editor/components/PropertiesPanel/PropertiesPanel';
-import TopBar from '../../../business-card-editor/components/TopBar/TopBar';
-import useEditorStore from '../../../business-card-editor/store/editorStore';
-import { decryptData } from '../../../business-card-editor/lib/encryption';
+import Canvas from '../../../../business-card-editor/components/Canvas/Canvas';
+import Toolbar from '../../../../business-card-editor/components/Toolbar/Toolbar';
+import PropertiesPanel from '../../../../business-card-editor/components/PropertiesPanel/PropertiesPanel';
+import TopBar from '../../../../business-card-editor/components/TopBar/TopBar';
+import useEditorStore from '../../../../business-card-editor/store/editorStore';
+import { decryptData } from '../../../../business-card-editor/lib/encryption';
 
 const EditorPage: React.FC = () => {
   const params = useParams();

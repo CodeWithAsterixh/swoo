@@ -3,51 +3,27 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    // Validation
-    if (!email || !password || !name) {
-      setError('Please fill in all fields');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (!agreeToTerms) {
-      setError('Please agree to Terms & Conditions');
-      return;
-    }
-
     setIsLoading(true);
-    const result = await register(email, password, name);
 
+    const result = await login(email, password);
     if (result.success) {
       router.push('/templates');
     } else {
-      setError(result.error || 'Registration failed');
+      setError(result.error || 'Login failed');
     }
 
     setIsLoading(false);
@@ -67,7 +43,7 @@ export default function RegisterPage() {
           
           <div className="relative z-10">
             <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">Swoo</h2>
-            <p className="text-lg text-purple-100">Create, Design, Share</p>
+            <p className="text-lg text-purple-100">Design Beautiful Business Cards</p>
           </div>
 
           <div className="relative z-10">
@@ -75,23 +51,23 @@ export default function RegisterPage() {
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold">Easy to Use</h3>
-                  <p className="text-purple-100 text-sm">Intuitive interface designed for everyone</p>
+                  <h3 className="text-white font-semibold">Lightning Fast</h3>
+                  <p className="text-purple-100 text-sm">Create stunning designs in seconds</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold">Professional Results</h3>
-                  <p className="text-purple-100 text-sm">Print-ready designs every time</p>
+                  <h3 className="text-white font-semibold">Fully Secure</h3>
+                  <p className="text-purple-100 text-sm">Your designs are always private</p>
                 </div>
               </div>
             </div>
@@ -103,39 +79,13 @@ export default function RegisterPage() {
         </div>
 
         {/* Right Panel - Form */}
-        <div className="bg-white rounded-l-3xl lg:rounded-l-none lg:rounded-r-3xl rounded-r-3xl p-8 lg:p-12 flex flex-col justify-center">
+        <div className="bg-white rounded-r-3xl lg:rounded-r-3xl rounded-l-3xl lg:rounded-l-none p-8 lg:p-12 flex flex-col justify-center">
           <div className="mb-8">
-            <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Create an account</h1>
-            <p className="text-slate-600">Already have an account?{' '}
-              <Link href="/auth/login" className="text-purple-600 font-semibold hover:text-purple-700">
-                Log in
-              </Link>
-            </p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Welcome Back</h1>
+            <p className="text-slate-600">Sign in to your Swoo account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">First Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John"
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Last Name</label>
-                <input
-                  type="text"
-                  placeholder="Doe"
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                />
-              </div>
-            </div>
-
+          <form onSubmit={handleSubmit} className="space-y-5 mb-6">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
               <input
@@ -149,40 +99,29 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-slate-700">Password</label>
+                <a href="#" className="text-sm text-purple-600 hover:text-purple-700 font-medium">Forgot?</a>
+              </div>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimum 6 characters"
+                placeholder="Enter your password"
                 required
                 className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter your password"
-                required
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
-
-            <div className="flex items-start">
+            <div className="flex items-center">
               <input
                 type="checkbox"
-                id="terms"
-                checked={agreeToTerms}
-                onChange={(e) => setAgreeToTerms(e.target.checked)}
-                className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer mt-1"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
               />
-              <label htmlFor="terms" className="ml-2 text-sm text-slate-600 cursor-pointer">
-                I agree to the <a href="#" className="text-purple-600 hover:text-purple-700 font-medium">Terms & Conditions</a>
-              </label>
+              <label htmlFor="remember" className="ml-2 text-sm text-slate-600 cursor-pointer">Remember me</label>
             </div>
 
             {error && (
@@ -196,7 +135,7 @@ export default function RegisterPage() {
               disabled={isLoading}
               className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
@@ -205,11 +144,11 @@ export default function RegisterPage() {
               <div className="w-full border-t border-slate-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-slate-500">Or register with</span>
+              <span className="px-2 bg-white text-slate-500">Or continue with</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mb-6">
             <button className="py-2 px-4 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors">
               Google
             </button>
@@ -217,6 +156,13 @@ export default function RegisterPage() {
               Apple
             </button>
           </div>
+
+          <p className="text-center text-slate-600 text-sm">
+            Don&apos;t have an account?{' '}
+            <Link href="/auth/register" className="text-purple-600 font-semibold hover:text-purple-700">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </main>

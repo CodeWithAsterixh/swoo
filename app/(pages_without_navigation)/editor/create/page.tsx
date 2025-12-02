@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { encryptData, decryptData } from '../../../business-card-editor/lib/encryption';
-import { useRequireAuth } from '../../contexts/useRequireAuth';
+import { encryptData, decryptData } from '../../../../business-card-editor/lib/encryption';
+import { useRequireAuth } from '../../../contexts/useRequireAuth';
 
 type Step = { id: string; title: string; status: 'pending' | 'running' | 'success' | 'error'; message?: string };
 
@@ -194,7 +194,7 @@ const CreatePage: React.FC = () => {
 
         {!saveMode && !loading && (
           <div className="p-4 bg-accent/10 border border-accent/30 rounded-lg text-accent text-xs leading-relaxed">
-            <strong>💡 Tip:</strong> Save Both keeps your design synced between cloud and offline storage. You'll always have a backup.
+            <strong>💡 Tip:</strong> Save Both keeps your design synced between cloud and offline storage. You&lsquo;ll always have a backup.
           </div>
         )}
       </div>
