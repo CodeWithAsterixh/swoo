@@ -79,19 +79,19 @@ const EditorPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#1e1e1e', color: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontSize: '16px', color: '#888' }}>Loading project...</div>
+      <div className="flex flex-col h-screen bg-base-200 text-base-content items-center justify-center">
+        <div className="text-base text-base-content/60">Loading project...</div>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#1e1e1e', color: '#fff' }}>
+    <div className="flex flex-col h-screen bg-base-200 text-base-content">
       <TopBar projectId={String(projectId || '')} />
-      {error && <div style={{ padding: '12px 20px', background: '#3a2a2a', color: '#ff6b6b', fontSize: '12px', borderBottom: '1px solid #3a3a3a' }}>Warning: {error}</div>}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      {error && <div className="px-5 py-3 bg-red-500/10 text-red-600 text-xs border-b border-red-500/30">Warning: {error}</div>}
+      <div className="flex flex-1 overflow-hidden">
         <Toolbar />
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#121212', padding: '16px' }}>
+        <div className="flex-1 flex justify-center items-center bg-base-100 p-4">
           <Canvas projectId={String(projectId || '')} />
         </div>
         <PropertiesPanel />

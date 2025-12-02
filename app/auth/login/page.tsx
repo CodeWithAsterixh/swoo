@@ -8,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -29,185 +30,136 @@ export default function LoginPage() {
   };
 
   return (
-    <main style={{
-      background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '420px',
-        background: 'rgba(255, 255, 255, 0.05)',
-        border: '1px solid rgba(11, 118, 255, 0.2)',
-        borderRadius: '16px',
-        padding: '40px',
-        backdropFilter: 'blur(10px)',
-      }}>
-        <h1 style={{
-          fontSize: '28px',
-          fontWeight: 700,
-          margin: '0 0 8px',
-          background: 'linear-gradient(135deg, #ffffff 0%, #ccc 100%)',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}>
-          Welcome Back
-        </h1>
-
-        <p style={{
-          fontSize: '14px',
-          color: '#aaa',
-          margin: '0 0 32px',
-        }}>
-          Sign in to your Swoo account to continue designing
-        </p>
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#ddd',
-              marginBottom: '8px',
-            }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(11, 118, 255, 0.2)',
-                borderRadius: '8px',
-                color: '#fff',
-                fontSize: '14px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                transition: 'all 0.3s ease',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(11, 118, 255, 0.5)';
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(11, 118, 255, 0.2)';
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-              }}
-            />
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-stretch">
+        
+        {/* Left Panel - Visual/Branding */}
+        <div className="hidden lg:flex lg:flex-col lg:justify-between bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-l-3xl p-12 relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/3 translate-y-1/3" />
+          </div>
+          
+          <div className="relative z-10">
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">Swoo</h2>
+            <p className="text-lg text-purple-100">Design Beautiful Business Cards</p>
           </div>
 
-          <div>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#ddd',
-              marginBottom: '8px',
-            }}>
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(11, 118, 255, 0.2)',
-                borderRadius: '8px',
-                color: '#fff',
-                fontSize: '14px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                transition: 'all 0.3s ease',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(11, 118, 255, 0.5)';
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(11, 118, 255, 0.2)';
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-              }}
-            />
-          </div>
-
-          {error && (
-            <div style={{
-              padding: '12px 16px',
-              background: 'rgba(255, 107, 107, 0.1)',
-              border: '1px solid rgba(255, 107, 107, 0.3)',
-              borderRadius: '8px',
-              color: '#ff6b6b',
-              fontSize: '13px',
-            }}>
-              {error}
+          <div className="relative z-10">
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold">Lightning Fast</h3>
+                  <p className="text-purple-100 text-sm">Create stunning designs in seconds</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold">Fully Secure</h3>
+                  <p className="text-purple-100 text-sm">Your designs are always private</p>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            style={{
-              padding: '12px 20px',
-              background: isLoading ? 'rgba(11, 118, 255, 0.5)' : 'linear-gradient(135deg, #0b76ff 0%, #00d4ff 100%)',
-              border: 'none',
-              color: '#fff',
-              borderRadius: '8px',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              fontSize: '14px',
-              fontWeight: 600,
-              transition: 'all 0.3s ease',
-              boxShadow: isLoading ? 'none' : '0 8px 24px rgba(11, 118, 255, 0.3)',
-              marginTop: '8px',
-            }}
-            onMouseEnter={(e) => {
-              if (!isLoading) {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 12px 32px rgba(11, 118, 255, 0.5)';
-                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isLoading) {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 24px rgba(11, 118, 255, 0.3)';
-                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
-              }
-            }}
-          >
-            {isLoading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+          <div className="relative z-10 text-sm text-purple-100">
+            © 2025 Swoo. All rights reserved.
+          </div>
+        </div>
 
-        <div style={{
-          marginTop: '24px',
-          paddingTop: '24px',
-          borderTop: '1px solid rgba(11, 118, 255, 0.1)',
-          textAlign: 'center',
-        }}>
-          <p style={{ fontSize: '13px', color: '#aaa', margin: '0' }}>
-            Don&apos;t have an account?{' '}
-            <Link
-              href="/auth/register"
-              style={{
-                color: '#0b76ff',
-                textDecoration: 'none',
-                fontWeight: 600,
-                transition: 'color 0.3s ease',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#00d4ff')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#0b76ff')}
+        {/* Right Panel - Form */}
+        <div className="bg-white rounded-r-3xl lg:rounded-r-3xl rounded-l-3xl lg:rounded-l-none p-8 lg:p-12 flex flex-col justify-center">
+          <div className="mb-8">
+            <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Welcome Back</h1>
+            <p className="text-slate-600">Sign in to your Swoo account</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5 mb-6">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                required
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-slate-700">Password</label>
+                <a href="#" className="text-sm text-purple-600 hover:text-purple-700 font-medium">Forgot?</a>
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+              />
+              <label htmlFor="remember" className="ml-2 text-sm text-slate-600 cursor-pointer">Remember me</label>
+            </div>
+
+            {error && (
+              <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-slate-500">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <button className="py-2 px-4 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors">
+              Google
+            </button>
+            <button className="py-2 px-4 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors">
+              Apple
+            </button>
+          </div>
+
+          <p className="text-center text-slate-600 text-sm">
+            Don&apos;t have an account?{' '}
+            <Link href="/auth/register" className="text-purple-600 font-semibold hover:text-purple-700">
               Sign up
             </Link>
           </p>

@@ -110,118 +110,35 @@ const CreatePage: React.FC = () => {
   };
 
   return (
-    <main style={{
-      background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
-      minHeight: 'calc(100vh - 64px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '600px',
-        background: 'rgba(255, 255, 255, 0.05)',
-        border: '1px solid rgba(11, 118, 255, 0.2)',
-        borderRadius: '16px',
-        padding: '40px',
-        backdropFilter: 'blur(10px)',
-      }}>
-        <h1 style={{
-          fontSize: '32px',
-          fontWeight: 700,
-          margin: '0 0 16px',
-          background: 'linear-gradient(135deg, #ffffff 0%, #ccc 100%)',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}>
+    <main className="min-h-screen bg-base-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-base-200 border border-base-300 rounded-2xl p-8">
+        <h1 className="text-4xl font-bold mb-4 text-base-content">
           Create New Design
         </h1>
 
-        <p style={{
-          fontSize: '14px',
-          color: '#aaa',
-          margin: '0 0 32px',
-          lineHeight: '1.6',
-        }}>
+        <p className="text-base text-base-content/70 mb-8 leading-relaxed">
           Choose how you want to save your new business card design. You can always change it later.
         </p>
 
         {!saveMode && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+          <div className="flex flex-col gap-3 mb-6">
             <button
               onClick={() => handleCreate('remote')}
-              style={{
-                padding: '14px 20px',
-                background: 'linear-gradient(135deg, #0b76ff 0%, #00d4ff 100%)',
-                border: 'none',
-                color: '#fff',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: 600,
-                transition: 'all 0.3s ease',
-                boxShadow: '0 8px 24px rgba(11, 118, 255, 0.3)',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 12px 32px rgba(11, 118, 255, 0.5)';
-                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 24px rgba(11, 118, 255, 0.3)';
-                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
-              }}
+              className="w-full px-6 py-3 font-semibold rounded-lg transition-all duration-200 cursor-pointer bg-primary text-primary-content hover:shadow-lg hover:scale-105 active:scale-95"
             >
               🌐 Save to Cloud
             </button>
 
             <button
               onClick={() => handleCreate('local')}
-              style={{
-                padding: '14px 20px',
-                background: 'rgba(11, 118, 255, 0.1)',
-                border: '2px solid rgba(11, 118, 255, 0.3)',
-                color: '#0b76ff',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: 600,
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(11, 118, 255, 0.2)';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(11, 118, 255, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(11, 118, 255, 0.1)';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(11, 118, 255, 0.3)';
-              }}
+              className="w-full px-6 py-3 font-semibold rounded-lg transition-all duration-200 cursor-pointer bg-transparent border-2 border-primary text-primary hover:bg-primary/10 active:bg-primary/20"
             >
               💾 Save Locally Only
             </button>
 
             <button
               onClick={() => handleCreate('both')}
-              style={{
-                padding: '14px 20px',
-                background: 'rgba(0, 212, 255, 0.1)',
-                border: '2px solid rgba(0, 212, 255, 0.3)',
-                color: '#00d4ff',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: 600,
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.2)';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0, 212, 255, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.1)';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0, 212, 255, 0.3)';
-              }}
+              className="w-full px-6 py-3 font-semibold rounded-lg transition-all duration-200 cursor-pointer bg-transparent border-2 border-accent text-accent hover:bg-accent/10 active:bg-accent/20"
             >
               ☁️ Save Both (Recommended)
             </button>
@@ -229,61 +146,36 @@ const CreatePage: React.FC = () => {
         )}
 
         {loading && (
-          <div style={{
-            padding: '16px',
-            background: 'rgba(11, 118, 255, 0.1)',
-            borderRadius: '8px',
-            borderLeft: '4px solid #0b76ff',
-            marginBottom: '20px',
-          }}>
-            <div style={{ color: '#0b76ff', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>
+          <div className="p-4 bg-primary/10 rounded-lg border-l-4 border-primary mb-5">
+            <div className="text-primary text-sm font-semibold mb-2">
               Creating your design...
             </div>
-            <div style={{ fontSize: '12px', color: '#aaa' }}>This may take a moment</div>
+            <div className="text-xs text-base-content/60">This may take a moment</div>
           </div>
         )}
 
         {steps && steps.length > 0 && (
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(11, 118, 255, 0.1)',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '20px',
-          }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#0b76ff', marginBottom: '12px' }}>
+          <div className="bg-base-100 border border-base-300 rounded-lg p-4 mb-5">
+            <div className="text-xs font-semibold text-primary mb-3">
               Progress
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="flex flex-col gap-2">
               {steps.map((s) => (
-                <div key={s.id} style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                  opacity: s.status === 'pending' ? 0.5 : 1,
-                }}>
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    minWidth: '20px',
-                    borderRadius: '50%',
-                    background: s.status === 'running' ? 'rgba(11, 118, 255, 0.3)' : s.status === 'success' ? 'rgba(76, 175, 80, 0.3)' : s.status === 'error' ? 'rgba(255, 107, 107, 0.3)' : 'rgba(255, 255, 255, 0.1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '12px',
+                <div key={s.id} className={`flex items-start gap-3 ${s.status === 'pending' ? 'opacity-50' : ''}`}>
+                  <div className="w-5 h-5 min-w-5 rounded-full flex items-center justify-center text-xs" style={{
+                    background: s.status === 'running' ? 'oklch(80% 0.114 19.571 / 0.2)' : s.status === 'success' ? 'rgba(76, 175, 80, 0.2)' : s.status === 'error' ? 'rgba(255, 107, 107, 0.2)' : 'oklch(88.272% 0.011 223.975)',
                   }}>
                     {s.status === 'running' && '⏳'}
                     {s.status === 'success' && '✓'}
                     {s.status === 'error' && '✕'}
                     {s.status === 'pending' && '○'}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 500, color: '#fff', marginBottom: '2px' }}>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-base-content mb-1">
                       {s.title}
                     </div>
                     {s.message && (
-                      <div style={{ fontSize: '12px', color: '#888' }}>
+                      <div className="text-xs text-base-content/60">
                         {s.message}
                       </div>
                     )}
@@ -295,30 +187,14 @@ const CreatePage: React.FC = () => {
         )}
 
         {error && (
-          <div style={{
-            padding: '16px',
-            background: 'rgba(255, 107, 107, 0.1)',
-            border: '1px solid rgba(255, 107, 107, 0.3)',
-            borderRadius: '8px',
-            color: '#ff6b6b',
-            fontSize: '13px',
-            marginBottom: '20px',
-          }}>
+          <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm mb-5">
             {error}
           </div>
         )}
 
         {!saveMode && !loading && (
-          <div style={{
-            padding: '16px',
-            background: 'rgba(0, 212, 255, 0.05)',
-            border: '1px solid rgba(0, 212, 255, 0.2)',
-            borderRadius: '8px',
-            fontSize: '12px',
-            color: '#00d4ff',
-            lineHeight: '1.6',
-          }}>
-            <strong>💡 Tip:</strong> Save Both keeps your design synced between cloud and offline storage. You&apos;ll always have a backup.
+          <div className="p-4 bg-accent/10 border border-accent/30 rounded-lg text-accent text-xs leading-relaxed">
+            <strong>💡 Tip:</strong> Save Both keeps your design synced between cloud and offline storage. You'll always have a backup.
           </div>
         )}
       </div>

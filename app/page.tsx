@@ -1,237 +1,126 @@
 "use client";
-import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react';
+import Hero from './components/Hero';
+import FeatureCard from './components/FeatureCard';
+import Footer from './components/Footer';
 
-const Home: React.FC = () => {
-  const router = useRouter();
-  const demoId = 'demo-project';
+export default function Home() {
+  useEffect(() => {
+    const observeFadeUps = () => {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('opacity-100', 'translate-y-0');
+          }
+        });
+      }, { threshold: 0.18 });
+
+      document.querySelectorAll('[data-animate-fade-up]').forEach(el => {
+        obs.observe(el);
+      });
+
+      return () => obs.disconnect();
+    };
+
+    observeFadeUps();
+  }, []);
+
+  const features = [
+    {
+      title: 'Canvas Designer',
+      desc: 'Intuitive drag-and-drop interface with real-time preview and pixel-perfect control.',
+    },
+    {
+      title: 'Print Ready',
+      desc: 'Export high-resolution PDFs, PNGs, and SVGs optimized for professional printing.',
+    },
+    {
+      title: 'Cloud & Local',
+      desc: 'Save to the cloud or keep designs offline. Full privacy control in your hands.',
+    },
+    {
+      title: 'Templates',
+      desc: 'Start with professionally designed templates and customize them in minutes.',
+    },
+    {
+      title: 'Collaborate',
+      desc: 'Share your designs with teammates and get feedback directly on your canvas.',
+    },
+    {
+      title: 'Version Control',
+      desc: 'Save and revert to any previous version of your design with full history.',
+    },
+  ];
 
   return (
-    <main style={{
-      background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
-      minHeight: 'calc(100vh - 64px)',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '40px 24px',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      {/* Animated gradient background */}
-      <div style={{
-        position: 'absolute',
-        top: '-50%',
-        right: '-20%',
-        width: '600px',
-        height: '600px',
-        background: 'radial-gradient(circle, rgba(11, 118, 255, 0.15) 0%, transparent 70%)',
-        borderRadius: '50%',
-        animation: 'float 20s ease-in-out infinite',
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '-30%',
-        left: '-10%',
-        width: '500px',
-        height: '500px',
-        background: 'radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%)',
-        borderRadius: '50%',
-        animation: 'float 15s ease-in-out infinite reverse',
-      }} />
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(30px); }
-        }
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideInDown {
-          from {
-            opacity: 0;
-            transform: translateY(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-
-      <div style={{
-        position: 'relative',
-        zIndex: 1,
-        textAlign: 'center',
-        maxWidth: '800px',
-      }}>
-        <h1 style={{
-          fontSize: '56px',
-          fontWeight: 700,
-          margin: '0 0 20px',
-          background: 'linear-gradient(135deg, #ffffff 0%, #ccc 100%)',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          animation: 'slideInDown 0.8s ease-out',
-        }}>
-          Design Professional Business Cards
-        </h1>
-
-        <p style={{
-          fontSize: '18px',
-          color: '#bbb',
-          margin: '0 0 32px',
-          lineHeight: '1.6',
-          animation: 'slideInUp 0.8s ease-out 0.1s both',
-        }}>
-          Create stunning business cards with our intuitive canvas-based designer. No design experience needed. Work online or offline. Your designs stay encrypted.
-        </p>
-
-        <div style={{
-          display: 'flex',
-          gap: '16px',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          animation: 'slideInUp 0.8s ease-out 0.2s both',
-          marginBottom: '64px',
-        }}>
-          <button
-            onClick={() => router.push('/editor/create')}
-            style={{
-              padding: '14px 28px',
-              fontSize: '16px',
-              fontWeight: 600,
-              background: 'linear-gradient(135deg, #0b76ff 0%, #00d4ff 100%)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              boxShadow: '0 8px 24px rgba(11, 118, 255, 0.3)',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              (e.target as HTMLButtonElement).style.boxShadow = '0 12px 32px rgba(11, 118, 255, 0.5)';
-              (e.target as HTMLButtonElement).style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              (e.target as HTMLButtonElement).style.boxShadow = '0 8px 24px rgba(11, 118, 255, 0.3)';
-              (e.target as HTMLButtonElement).style.transform = 'translateY(0)';
-            }}
-          >
-            Create New Design
-          </button>
-
-          <Link
-            href="/templates"
-            style={{
-              padding: '14px 28px',
-              fontSize: '16px',
-              fontWeight: 600,
-              background: 'rgba(11, 118, 255, 0.1)',
-              color: '#0b76ff',
-              border: '2px solid rgba(11, 118, 255, 0.3)',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(11, 118, 255, 0.2)';
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(11, 118, 255, 0.5)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(11, 118, 255, 0.1)';
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(11, 118, 255, 0.3)';
-            }}
-          >
-            Browse Templates
-          </Link>
-
-          <button
-            onClick={() => router.push(`/editor/${demoId}`)}
-            style={{
-              padding: '14px 28px',
-              fontSize: '16px',
-              fontWeight: 600,
-              background: 'rgba(255, 255, 255, 0.05)',
-              color: '#ccc',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              (e.target as HTMLButtonElement).style.background = 'rgba(255, 255, 255, 0.1)';
-              (e.target as HTMLButtonElement).style.borderColor = 'rgba(255, 255, 255, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              (e.target as HTMLButtonElement).style.background = 'rgba(255, 255, 255, 0.05)';
-              (e.target as HTMLButtonElement).style.borderColor = 'rgba(255, 255, 255, 0.1)';
-            }}
-          >
-            Try Demo
-          </button>
-        </div>
-
-        {/* Features Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '20px',
-          marginTop: '80px',
-        }}>
-          {[
-            { icon: '⚡', title: 'Fast & Responsive', desc: 'Real-time canvas editing with smooth interactions' },
-            { icon: '🔒', title: 'Privacy First', desc: 'All designs encrypted locally in your browser' },
-            { icon: '🎨', title: 'Intuitive Design', desc: 'Drag, resize, rotate with visual feedback' },
-            { icon: '📱', title: 'Export Ready', desc: 'Download high-quality images for print' },
-          ].map((feature, idx) => (
-            <div
-              key={idx}
-              style={{
-                padding: '24px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(11, 118, 255, 0.2)',
-                borderRadius: '12px',
-                backdropFilter: 'blur(10px)',
-                textAlign: 'center',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background = 'rgba(11, 118, 255, 0.1)';
-                (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(11, 118, 255, 0.4)';
-                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background = 'rgba(255, 255, 255, 0.05)';
-                (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(11, 118, 255, 0.2)';
-                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-              }}
+    <main className="bg-base-100">
+      <Hero />
+      
+      {/* Features Section */}
+      <section className="py-20 md:py-32 bg-base-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-base-content opacity-0 translate-y-6 transition-all duration-700 ease-out"
+              data-animate-fade-up
             >
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>{feature.icon}</div>
-              <h3 style={{ fontSize: '16px', fontWeight: 600, margin: '0 0 8px', color: '#fff' }}>
-                {feature.title}
-              </h3>
-              <p style={{ fontSize: '13px', color: '#aaa', margin: 0 }}>{feature.desc}</p>
-            </div>
-          ))}
+              Powerful Features
+            </h2>
+            <p 
+              className="text-lg text-base-content/70 max-w-2xl mx-auto opacity-0 translate-y-6 transition-all duration-700 ease-out"
+              data-animate-fade-up
+            >
+              Everything you need to create stunning designs, efficiently.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, i) => (
+              <div 
+                key={i}
+                className="opacity-0 translate-y-6 transition-all duration-700 ease-out"
+                data-animate-fade-up
+              >
+                <FeatureCard title={feature.title} desc={feature.desc} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Showcase Section */}
+      <section className="py-20 md:py-32 bg-base-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h3 
+              className="text-3xl md:text-4xl font-bold mb-6 text-base-content opacity-0 translate-y-6 transition-all duration-700 ease-out"
+              data-animate-fade-up
+            >
+              Design with Confidence
+            </h3>
+            <p 
+              className="text-lg text-base-content/70 mb-8 leading-relaxed opacity-0 translate-y-6 transition-all duration-700 ease-out"
+              data-animate-fade-up
+            >
+              Our canvas editor provides all the tools professionals need. From basic shapes to advanced text effects, create exactly what you envision.
+            </p>
+            <ul className="space-y-3 opacity-0 translate-y-6 transition-all duration-700 ease-out" data-animate-fade-up>
+              {['Unlimited layers', 'Vector and raster support', 'Smart guides and snapping', 'Live collaboration'].map((item, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                  <span className="text-base-content">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="h-96 rounded-2xl bg-gradient-to-br from-base-100 to-base-300 shadow-xl flex items-center justify-center p-6 opacity-0 translate-y-6 transition-all duration-700 ease-out" data-animate-fade-up>
+            <div className="w-72 h-80 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 shadow-lg" />
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </main>
   );
-};
-
-export default Home;
-
+}

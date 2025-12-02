@@ -75,76 +75,30 @@ const TemplatesPage: React.FC = () => {
   };
 
   const TemplateCard: React.FC<{ item: Template; onUse: () => void; onOpen?: () => void }> = ({ item, onUse, onOpen }) => (
-    <div
-      style={{
-        background: 'rgba(255, 255, 255, 0.05)',
-        border: '1px solid rgba(11, 118, 255, 0.2)',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        transition: 'all 0.3s ease',
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.background = 'rgba(11, 118, 255, 0.08)';
-        (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(11, 118, 255, 0.4)';
-        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)';
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.background = 'rgba(255, 255, 255, 0.05)';
-        (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(11, 118, 255, 0.2)';
-        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-      }}
-    >
+    <div className="bg-base-200 border border-base-300 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col hover:shadow-lg hover:-translate-y-1">
       <div
+        className="h-36 flex items-center justify-center p-4 text-sm font-semibold text-center border-b border-base-300"
         style={{
-          height: '140px',
-          background: item.project?.canvas?.backgroundColor ?? '#2a2a2a',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: item.project?.canvas?.backgroundColor?.includes('fff') || item.project?.canvas?.backgroundColor?.includes('f5f') ? '#333' : '#fff',
-          padding: '16px',
-          fontSize: '13px',
-          fontWeight: 600,
-          textAlign: 'center',
-          borderBottom: '1px solid rgba(11, 118, 255, 0.1)',
+          background: item.project?.canvas?.backgroundColor ?? 'oklch(88.272% 0.011 223.975)',
+          color: item.project?.canvas?.backgroundColor?.includes('fff') || item.project?.canvas?.backgroundColor?.includes('f5f') ? '#333' : 'oklch(26.71% 0.049 252.525)',
         }}
       >
         <div>
-          <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '4px' }}>
+          <div className="text-base font-bold mb-1">
             {item.name}
           </div>
-          <div style={{ fontSize: '12px', opacity: 0.7 }}>
+          <div className="text-xs opacity-70">
             {item.project?.pages?.[0]?.elements?.length ?? 0} elements
           </div>
         </div>
       </div>
 
-      <div style={{ padding: '12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div className="p-3 flex-1 flex flex-col gap-2">
         {item.category === 'local' ? (
           <>
             <button
               onClick={onOpen}
-              style={{
-                flex: 1,
-                background: 'linear-gradient(135deg, #0b76ff 0%, #00d4ff 100%)',
-                color: '#fff',
-                border: 'none',
-                padding: '8px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: 600,
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 12px rgba(11, 118, 255, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
-              }}
+              className="flex-1 bg-primary text-primary-content font-semibold py-2 px-3 rounded-lg cursor-pointer text-sm transition-all duration-200 hover:shadow-md active:scale-95"
             >
               Open Project
             </button>
@@ -153,24 +107,7 @@ const TemplatesPage: React.FC = () => {
           <>
             <button
               onClick={onUse}
-              style={{
-                flex: 1,
-                background: 'linear-gradient(135deg, #0b76ff 0%, #00d4ff 100%)',
-                color: '#fff',
-                border: 'none',
-                padding: '8px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: 600,
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 12px rgba(11, 118, 255, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
-              }}
+              className="flex-1 bg-primary text-primary-content font-semibold py-2 px-3 rounded-lg cursor-pointer text-sm transition-all duration-200 hover:shadow-md active:scale-95"
             >
               Use Template
             </button>
@@ -184,22 +121,13 @@ const TemplatesPage: React.FC = () => {
     if (items.length === 0) return null;
 
     return (
-      <div style={{ marginBottom: '60px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '20px', color: '#fff', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '4px',
-            height: '24px',
-            background: 'linear-gradient(135deg, #0b76ff 0%, #00d4ff 100%)',
-            borderRadius: '2px',
-          }} />
+      <div className="mb-20">
+        <h2 className="text-2xl font-bold mb-6 text-base-content flex items-center gap-3">
+          <div className="w-1 h-6 bg-primary rounded-full" />
           {title}
-          <span style={{ fontSize: '13px', color: '#666', fontWeight: 500 }}>({items.length})</span>
+          <span className="text-sm text-base-content/50 font-normal">({items.length})</span>
         </h2>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-          gap: '16px',
-        }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {items.map(item => (
             <TemplateCard
               key={item.id}
@@ -214,50 +142,18 @@ const TemplatesPage: React.FC = () => {
   };
 
   return (
-    <main style={{
-      background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
-      minHeight: 'calc(100vh - 64px)',
-      padding: '48px 24px',
-    }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        <div style={{ marginBottom: '48px' }}>
-          <h1 style={{
-            fontSize: '40px',
-            fontWeight: 700,
-            margin: '0 0 12px',
-            background: 'linear-gradient(135deg, #ffffff 0%, #ccc 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
+    <main className="min-h-screen bg-base-100 pt-16 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 text-base-content">
             Templates & Projects
           </h1>
-          <p style={{ fontSize: '16px', color: '#aaa', margin: 0 }}>
+          <p className="text-lg text-base-content/70 mb-6">
             Start from a template or continue working on your saved projects. Create a new design to get started.
           </p>
           <button
             onClick={() => router.push('/editor/create')}
-            style={{
-              marginTop: '16px',
-              padding: '12px 24px',
-              background: 'linear-gradient(135deg, #0b76ff 0%, #00d4ff 100%)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: 600,
-              boxShadow: '0 8px 24px rgba(11, 118, 255, 0.3)',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 12px 32px rgba(11, 118, 255, 0.5)';
-              (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 24px rgba(11, 118, 255, 0.3)';
-              (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
-            }}
+            className="inline-flex items-center justify-center px-6 py-3 font-semibold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap bg-primary text-primary-content hover:shadow-lg hover:scale-105 active:scale-95"
           >
             + Create New Design
           </button>
