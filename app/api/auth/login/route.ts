@@ -21,17 +21,25 @@ export async function POST(req: NextRequest) {
     await connectDb();
 
     // Find user and include password for comparison
-    const user = await User.findOne({ email }).select('+passwordHash');
+    console.log('[login] Attempting to find user:', email);
+    const normalizedEmail = email.toLowerCase().trim();
+    console.log('[login] Normalized email:', normalizedEmail);
+    const user = await User.findOne({ email: normalizedEmail }).select('+passwordHash');
     if (!user) {
+      console.log('[login] User not found:', email);
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
+    console.log('[login] User found:', email, 'has passwordHash:', !!user.passwordHash);
+
     // Compare password
     const isPasswordValid = await user.comparePassword(password);
+    console.log('[login] Password comparison result:', isPasswordValid);
     if (!isPasswordValid) {
+      console.log('[login] Invalid password for user:', email);
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
@@ -39,13 +47,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate token
+    console.log('[login] Generating token for user:', email);
     const token = signToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role,
     });
+    console.log('[login] Token generated successfully');
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         success: true,
         message: 'Login successful',
@@ -59,8 +69,21 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 }
     );
+
+    // Set auth token as HTTP-only cookie (secure in production)
+    response.cookies.set('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+      path: '/',
+    });
+
+    return response;
   } catch (error: any) {
-    console.error('Login error:', error);
+    console.error('[login] Error occurred:', error);
+    console.error('[login] Error message:', error?.message);
+    console.error('[login] Error stack:', error?.stack);
     return NextResponse.json(
       { error: error?.message || 'Login failed' },
       { status: 500 }

@@ -16,30 +16,19 @@ export async function connectDb() {
     // Keep sockets alive for long-running operations
     socketTimeoutMS: 45000,
   } as any;
-  // If the connection string does not include a database name, default to `swoocards`.
-  // This prevents the driver from writing to the `test` database when the URI lacks a DB.
-  const defaultDb = process.env.MONGODB_DB || 'swoocards';
-  const hasDbInUri = (() => {
-    try {
-      // Match a path segment after the host in the URI (e.g. /mydb or /mydb?opts)
-      const m = MONGO_URI.match(/\/([^/?]+)(?=(\?|$))/);
-      return !!(m && m[1] && m[1].length > 0);
-    } catch {
-      return false;
-    }
-  })();
-
-  if (!hasDbInUri) {
-    opts.dbName = defaultDb;
-  }
+  
+  // Always explicitly set the database name to 'swoocards'
+  // MongoDB Atlas URIs don't include the database name by default
+  opts.dbName = 'swoocards';
 
   try {
     // Helpful log for debugging connection errors in dev
-    console.log('[db] connecting to MongoDB', MONGO_URI ? '(using MONGODB_URI)' : '(using default)');
+    console.log('[db] connecting to MongoDB (using MONGODB_URI)');
+    console.log('[db] target database: swoocards');
 
     const conn = await mongoose.connect(MONGO_URI, opts);
 
-    console.log('[db] MongoDB connected');
+    console.log('[db] MongoDB connected to database:', conn.connection.name || 'swoocards');
 
     cached.conn = conn;
     return conn;

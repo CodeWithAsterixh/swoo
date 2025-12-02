@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDb } from '../../../business-card-editor/lib/db';
 import projectService from '../../../business-card-editor/services/projectService';
@@ -6,7 +7,13 @@ import { authenticateToken, JWTPayload } from '../../../business-card-editor/lib
 // Verify authentication helper
 async function verifyAuth(req: NextRequest): Promise<{ user: JWTPayload | null; response: NextResponse | null }> {
   const authHeader = req.headers.get('authorization');
-  const user = authenticateToken(authHeader || '');
+  // Try to read token from Authorization header first, then cookies
+  const cookieToken = req.cookies.get('auth_token')?.value || req.cookies.get('token')?.value || null;
+  console.log('[projects/route] Authorization header:', authHeader, 'cookie present:', !!cookieToken);
+
+  // Build a token input for authenticateToken: prefer header (which includes 'Bearer ...'), otherwise construct one from cookie
+  const tokenInput = authHeader || (cookieToken ? `Bearer ${cookieToken}` : '');
+  const user = authenticateToken(tokenInput || '');
 
   if (!user) {
     return {
@@ -54,17 +61,24 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { user, response } = await verifyAuth(req);
-  if (response) return response;
-
-  if (!user) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    );
-  }
-
+  // Parse payload first so we can decide whether auth is required
   const payload = await req.json();
+  const saveMode = payload?.saveMode as 'remote' | 'local' | 'both' | undefined;
+
+  // Require authentication only if client requests a remote save (or both)
+  let user = null as any;
+  if (saveMode === 'remote' || saveMode === 'both') {
+    const auth = await verifyAuth(req);
+    if (auth.response) return auth.response;
+    console.log('[projects/route.POST] Authenticated user:', auth.user);
+    user = auth.user;
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+  }
 
   type Step = { id: string; title: string; status: 'pending' | 'running' | 'success' | 'error'; message?: string };
 
@@ -79,7 +93,6 @@ export async function POST(req: NextRequest) {
   steps[steps.length - 1].status = 'success';
 
   // If client didn't indicate save preference, return choices so caller can decide.
-  const saveMode = payload.saveMode as 'remote' | 'local' | 'both' | undefined;
   if (!saveMode) {
     steps.push({ id: 'choose', title: 'Choose save destination', status: 'pending', message: 'No saveMode provided. Choose `remote`, `local`, or `both`.' });
     return NextResponse.json({ steps, choices: ['remote', 'local', 'both'], note: 'Include `saveMode` in the request body to proceed.' });

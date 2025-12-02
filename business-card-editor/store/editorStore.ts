@@ -2,7 +2,7 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 import type { ProjectType, NewElementInput, Element } from '../types/project';
-import { generateId } from '../lib/utils';
+import { generateId, generateObjectId } from '../lib/utils';
 import { encryptData, decryptData } from '../lib/encryption';
 
 const MAX_STACK = 60;
@@ -10,6 +10,7 @@ const STORAGE_KEY = 'swoocards';
 
 type Selected = { pageId: string; elementId: string } | null;
 type SelectedElements = Array<{ pageId: string; elementId: string }>;
+type SaveStatus = 'unsaved' | 'saving' | 'saved' | 'error';
 
 type EditorState = {
   project: ProjectType | null;
@@ -21,6 +22,9 @@ type EditorState = {
   snapToGrid: boolean;
   gridSize: number;
   pendingElement: Partial<Element> | null;
+  saveStatus: SaveStatus;
+  saveStatusMessage: string | null;
+  lastSavedAt: number | null; // timestamp of last successful save
 
   // placement actions
   startPlacement: (el: Partial<Element>) => void;
@@ -51,7 +55,10 @@ type EditorState = {
   // update project metadata
   updateProjectName: (name: string) => void;
 
-  saveToServer: (endpoint?: string) => Promise<Response | null>;
+  // save actions
+  saveToServer: (endpoint?: string, saveMode?: 'local' | 'remote' | 'both') => Promise<Response | null>;
+  setSaveStatus: (status: SaveStatus, message?: string | null) => void;
+  markUnsaved: () => void;
 };
 
 function cloneProject(p: ProjectType | null): ProjectType | null {
@@ -112,6 +119,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   redoStack: [],
   snapToGrid: true,
   gridSize: 5,
+  saveStatus: 'unsaved',
+  saveStatusMessage: null,
+  lastSavedAt: null,
 
   loadProject: (p) => {
     const cloned = cloneProject(p) as ProjectType;
@@ -233,6 +243,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const project = get().project;
     if (!project) return null;
     get().pushUndo();
+    get().markUnsaved();
     const element: Element = {
       id: el.id || generateId('el_'),
       type: el.type as any,
@@ -267,6 +278,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const project = get().project;
     if (!project) return null;
     get().pushUndo();
+    get().markUnsaved();
     let updated: Element | null = null;
     set(state => {
       const newProject = produce(state.project as ProjectType, draft => {
@@ -288,6 +300,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const project = get().project;
     if (!project) return;
     get().pushUndo();
+    get().markUnsaved();
     set(state => {
       const newProject = produce(state.project as ProjectType, draft => {
         const page = draft.pages.find(p => p.id === pageId) as any;
@@ -303,6 +316,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const project = get().project;
     if (!project) return null;
     get().pushUndo();
+    get().markUnsaved();
     const { snapToGrid, gridSize } = get();
     const snap = (v: number) => (snapToGrid ? Math.round(v / gridSize) * gridSize : v);
     let moved: Element | null = null;
@@ -326,6 +340,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const project = get().project;
     if (!project) return;
     get().pushUndo();
+    get().markUnsaved();
     set(state => {
       const newProject = produce(state.project as ProjectType, draft => {
         draft.canvas = { ...(draft.canvas ?? {}), ...(patch as any) } as any;
@@ -339,6 +354,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const project = get().project;
     if (!project) return;
     get().pushUndo();
+    get().markUnsaved();
     set(state => {
       const newProject = produce(state.project as ProjectType, draft => {
         updates.forEach(({ pageId, elementId, patch }) => {
@@ -358,6 +374,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const project = get().project;
     if (!project) return;
     get().pushUndo();
+    get().markUnsaved();
     set(state => {
       const newProject = produce(state.project as ProjectType, draft => {
         draft.name = name;
@@ -367,11 +384,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     });
   },
 
-  saveToServer: async (endpoint = '/api/projects') => {
+  // saveMode: 'local' | 'remote' | 'both' - when omitted, caller's intent determines behavior
+  saveToServer: async (endpoint = '/api/projects', saveMode?: 'local' | 'remote' | 'both') => {
     const project = get().project;
     if (!project) return null;
     
     // Always save to localStorage first
+    // Ensure local ID exists for client-side projects. Use a Mongo-like id and prefix with `local_`.
+    if (!project._id) {
+      project._id = `local_${generateObjectId()}`;
+    }
     saveToLocalStorage(project);
     
     try {
@@ -379,15 +401,34 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
       
       let body: any;
-      if (project._id) {
-        // PUT: update existing project
-        body = {
-          id: project._id,
-          data: project,
-        };
+      // Determine whether to POST (create remote) or PUT (update remote)
+      const isLocalId = typeof project._id === 'string' && project._id.startsWith('local_');
+
+      // If caller explicitly requested local-only, skip server call
+      if (saveMode === 'local') {
+        // already saved locally above
+        // return a synthetic Response indicating local save
+        const localResp = new Response(JSON.stringify({ success: true, saved: 'local', project }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        return localResp;
+      }
+
+      if (!project._id) {
+        // POST: create new remote project
+        body = { ...project, saveMode: saveMode ?? 'remote' };
+      } else if (isLocalId) {
+        // If local id has a valid ObjectId-like suffix (local_<24hex>), try using the suffix for remote PUT
+        const suffix = String(project._id).replace(/^local_/, '');
+        const isHex24 = /^[a-f0-9]{24}$/i.test(suffix);
+        if (isHex24) {
+          // Attempt to update remote with the suffix id
+          body = { id: suffix, data: project, saveMode: saveMode ?? 'remote' };
+        } else {
+          // Otherwise POST to create new remote project
+          body = { ...project, saveMode: saveMode ?? 'remote' };
+        }
       } else {
-        // POST: create new project
-        body = project;
+        // PUT: update existing remote project
+        body = { id: project._id, data: project, saveMode: saveMode ?? 'remote' };
       }
       
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -395,23 +436,61 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         headers['Authorization'] = `Bearer ${token}`;
       }
       
+      const method = body && body.id ? 'PUT' : 'POST';
+      console.log('[saveToServer] method:', method, 'endpoint:', endpoint, 'tokenPresent:', !!token, 'projectId:', project._id, 'saveMode:', saveMode);
       const res = await fetch(endpoint, {
-        method: project._id ? 'PUT' : 'POST',
+        method,
         headers,
         body: JSON.stringify(body),
       });
       if (res.ok) {
         const json = await res.json();
-        // refresh local project with server response and save it
-        const refreshed = cloneProject(json);
-        saveToLocalStorage(refreshed);
-        set(() => ({ project: refreshed }));
+        // The projects API returns a structured response with `result.remote` when saving remotely.
+        // Support both: either the endpoint returns the project directly, or returns { result: { remote: project } }.
+        let remoteProject: any = null;
+        if (json && json.result && json.result.remote) {
+          remoteProject = json.result.remote;
+        } else if (json && json._id) {
+          remoteProject = json;
+        } else if (json && json.project) {
+          remoteProject = json.project;
+        }
+
+        if (remoteProject) {
+          // If we created a remote from a local id, replace the local id with remote id
+          const refreshed = cloneProject(remoteProject as any) as ProjectType;
+          saveToLocalStorage(refreshed);
+          set(() => ({ project: refreshed }));
+        } else {
+          // For local-only responses, just ensure local copy remains saved
+          saveToLocalStorage(project);
+        }
       }
       return res;
     } catch (err) {
       console.error('saveToServer error', err);
       return null;
     }
+  },
+
+  setSaveStatus: (status: SaveStatus, message: string | null = null) => {
+    set(() => ({
+      saveStatus: status,
+      saveStatusMessage: message,
+      lastSavedAt: status === 'saved' ? Date.now() : get().lastSavedAt,
+    }));
+    // Auto-reset 'saved' status after 2.5 seconds
+    if (status === 'saved') {
+      setTimeout(() => {
+        if (get().saveStatus === 'saved') {
+          set(() => ({ saveStatus: 'unsaved' }));
+        }
+      }, 2500);
+    }
+  },
+
+  markUnsaved: () => {
+    set(() => ({ saveStatus: 'unsaved', saveStatusMessage: null }));
   },
 }));
 

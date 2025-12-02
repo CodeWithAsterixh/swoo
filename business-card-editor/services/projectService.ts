@@ -13,6 +13,8 @@ const listProjects = async (userId?: string): Promise<ProjectType[]> => {
 };
 
 const getProjectById = async (id: string): Promise<ProjectType | null> => {
+  // Prevent CastError for non-ObjectId values (e.g. local_... ids)
+  if (!Types.ObjectId.isValid(String(id))) return null;
   const doc = await ProjectModel.findById(id).lean().exec();
   return (doc as unknown as ProjectType) || null;
 };
@@ -32,11 +34,13 @@ const createProject = async (payload: Partial<ProjectType>): Promise<ProjectType
 };
 
 const updateProject = async (id: string, data: Partial<ProjectType>): Promise<ProjectType | null> => {
+  if (!Types.ObjectId.isValid(String(id))) return null;
   const updated = await ProjectModel.findByIdAndUpdate(id, data, { new: true }).lean().exec();
   return updated as unknown as ProjectType | null;
 };
 
 const deleteProject = async (id: string): Promise<void> => {
+  if (!Types.ObjectId.isValid(String(id))) return;
   await ProjectModel.findByIdAndDelete(id).exec();
 };
 
@@ -50,6 +54,7 @@ const addElement = async (projectId: string, pageId: string, elementInput: NewEl
     zIndex: elementInput.zIndex ?? 0,
   } as any;
 
+  if (!Types.ObjectId.isValid(String(projectId))) throw new Error('Project not found');
   const proj = await ProjectModel.findById(projectId).exec();
   if (!proj) throw new Error('Project not found');
   const page = proj.pages.find((p: any) => p.id === pageId) as any;
@@ -60,6 +65,7 @@ const addElement = async (projectId: string, pageId: string, elementInput: NewEl
 };
 
 const removeElement = async (projectId: string, pageId: string, elementId: string) => {
+  if (!Types.ObjectId.isValid(String(projectId))) throw new Error('Project not found');
   const proj = await ProjectModel.findById(projectId).exec();
   if (!proj) throw new Error('Project not found');
   const page = proj.pages.find((p: any) => p.id === pageId) as any;
@@ -69,7 +75,8 @@ const removeElement = async (projectId: string, pageId: string, elementId: strin
 };
 
 const saveProject = async (projectJson: ProjectType) => {
-  if (!projectJson._id) return createProject(projectJson);
+  // If projectJson._id is missing or is a client-local id (prefixed), create a new remote project
+  if (!projectJson._id || String(projectJson._id).startsWith('local_')) return createProject(projectJson);
   const id = projectJson._id;
   const data = {
     userId: projectJson.userId,

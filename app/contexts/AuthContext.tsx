@@ -70,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('[AuthContext.login] Attempting login for:', email);
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,11 +78,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const data = await res.json();
+      console.log('[AuthContext.login] Response status:', res.status, 'data:', data);
 
       if (!res.ok) {
+        console.log('[AuthContext.login] Login failed:', data.error);
         return { success: false, error: data.error || 'Login failed' };
       }
 
+      console.log('[AuthContext.login] Login successful, setting token and user');
       setTokenState(data.token);
       setUser(data.user);
       localStorage.setItem('auth_token', data.token);
@@ -89,12 +93,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return { success: true };
     } catch (error) {
+      console.error('[AuthContext.login] Exception:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Login failed' };
     }
   };
 
   const register = async (email: string, password: string, name?: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('[AuthContext.register] Attempting registration for:', email);
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -102,11 +108,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const data = await res.json();
+      console.log('[AuthContext.register] Response status:', res.status, 'data:', data);
 
       if (!res.ok) {
+        console.log('[AuthContext.register] Registration failed:', data.error);
         return { success: false, error: data.error || 'Registration failed' };
       }
 
+      console.log('[AuthContext.register] Registration successful, setting token and user');
       setTokenState(data.token);
       setUser(data.user);
       localStorage.setItem('auth_token', data.token);
@@ -114,15 +123,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return { success: true };
     } catch (error) {
+      console.error('[AuthContext.register] Exception:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Registration failed' };
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // Clear local state
     setTokenState(null);
     setUser(null);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
+
+    // Call logout endpoint to clear cookie on server
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.error('[AuthContext.logout] Error calling logout endpoint:', err);
+    }
   };
 
   const setToken = (newToken: string | null) => {
