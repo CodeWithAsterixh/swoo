@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
-@theme {
-  --color-base-100: oklch(25.33% 0.016 252.42);
-  --color-base-200: oklch(23.26% 0.014 253.1);
-  --color-base-300: oklch(21.15% 0.012 254.09);
-  --color-base-content: oklch(97.807% 0.029 256.847);
-  --color-primary: oklch(58% 0.233 277.117);
-  --color-primary-content: oklch(96% 0.018 272.314);
-  --color-secondary: oklch(65% 0.241 354.308);
-  --color-secondary-content: oklch(94% 0.028 342.258);
-  --color-accent: oklch(77% 0.152 181.912);
-  --color-accent-content: oklch(38% 0.063 188.416);
-  --color-neutral: oklch(14% 0.005 285.823);
-  --color-neutral-content: oklch(92% 0.004 286.32);
-  --color-info: oklch(74% 0.16 232.661);
-  --color-info-content: oklch(29% 0.066 243.157);
-  --color-success: oklch(76% 0.177 163.223);
-  --color-success-content: oklch(37% 0.077 168.94);
-  --color-warning: oklch(82% 0.189 84.429);
-  --color-warning-content: oklch(41% 0.112 45.904);
-  --color-error: oklch(71% 0.194 13.428);
-  --color-error-content: oklch(27% 0.105 12.094);
+:root { 
+
+  --hex-base-100: #1b1d24;
+--hex-base-200: #181a20;
+--hex-base-300: #15161c;
+--hex-base-content: #f5f7ff;
+
+--hex-primary: #7a3cff;
+--hex-primary-content: #f6f6ff;
+
+--hex-secondary: #ff4f8a;
+--hex-secondary-content: #ffeaf1;
+
+--hex-accent: #66e4c5;
+--hex-accent-content: #234d5c;
+
+--hex-neutral: #0f0f14;
+--hex-neutral-content: #ededf0;
+
+--hex-info: #6ba7ff;
+--hex-info-content: #1c2d63;
+
+--hex-success: #4be37f;
+--hex-success-content: #1e4229;
+
+--hex-warning: #ffdd66;
+--hex-warning-content: #613b0d;
+
+--hex-error: #ff6b4d;
+--hex-error-content: #3b0f0a;
+
+
+--color-base-100: var(--hex-base-100);
+  --color-base-200: var(--hex-base-200);
+  --color-base-300: var(--hex-base-300);
+  --color-base-content: var(--hex-base-content);
+
+  --color-primary: var(--hex-primary);
+  --color-primary-content: var(--hex-primary-content);
+
+  --color-secondary: var(--hex-secondary);
+  --color-secondary-content: var(--hex-secondary-content);
+
+  --color-accent: var(--hex-accent);
+  --color-accent-content: var(--hex-accent-content);
+
+  --color-neutral: var(--hex-neutral);
+  --color-neutral-content: var(--hex-neutral-content);
+
+  --color-info: var(--hex-info);
+  --color-info-content: var(--hex-info-content);
+
+  --color-success: var(--hex-success);
+  --color-success-content: var(--hex-success-content);
+
+  --color-warning: var(--hex-warning);
+  --color-warning-content: var(--hex-warning-content);
+
+  --color-error: var(--hex-error);
+  --color-error-content: var(--hex-error-content);
+
+
   --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
@@ -30,6 +71,47 @@
   --depth: 1;
   --noise: 0;
 }
+
+@theme {
+  --color-base-100: var(--color-base-100);
+  --color-base-200: var(--color-base-200);
+  --color-base-300: var(--color-base-300);
+  --color-base-content: var(--color-base-content);
+
+  --color-primary: var(--color-primary);
+  --color-primary-content: var(--color-primary-content);
+
+  --color-secondary: var(--color-secondary);
+  --color-secondary-content: var(--color-secondary-content);
+
+  --color-accent: var(--color-accent);
+  --color-accent-content: var(--color-accent-content);
+
+  --color-neutral: var(--color-neutral);
+  --color-neutral-content: var(--color-neutral-content);
+
+  --color-info: var(--color-info);
+  --color-info-content: var(--color-info-content);
+
+  --color-success: var(--color-success);
+  --color-success-content: var(--color-success-content);
+
+  --color-warning: var(--color-warning);
+  --color-warning-content: var(--color-warning-content);
+
+  --color-error: var(--color-error);
+  --color-error-content: var(--color-error-content);
+
+  --radius-selector: var(--radius-selector);
+  --radius-field: var(--radius-field);
+  --radius-box: var(--radius-box);
+  --size-selector: var(--size-selector);
+  --size-field: var(--size-field);
+  --border: var(--border);
+  --depth: var(--depth);
+  --noise: var(--noise);
+}
+
 
 @layer base {
   html {

@@ -28,9 +28,9 @@ const Navigation: React.FC = () => {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 px-4 py-4">
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="mx-auto w-full sm:w-2xl">
         {/* Main Navigation Banner */}
-        <div className="bg-primary/50 backdrop-blur-lg border border-base-300/40 rounded-full px-6 py-4 shadow-xl flex items-center justify-between">
+        <div className="bg-primary/50 backdrop-blur-lg border border-base-300/40 rounded-full p-2 shadow-xl flex items-center justify-between">
           {/* Left: Status Badge */}
           <div className="flex items-center gap-0 p-2 sm:pr-4 bg-base-300 text-secondary rounded-full text-xs font-semibold whitespace-nowrap">
             <Link href="/" className="flex items-center gap-0.5 shrink-0">
@@ -83,7 +83,7 @@ const Navigation: React.FC = () => {
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-base-100 border border-base-300 rounded-2xl shadow-xl overflow-hidden z-50">
+                  <div className="absolute right-0 top-[100%] mt-2 w-48 bg-base-100 border border-base-300 rounded-2xl shadow-xl overflow-hidden z-50">
                     <div className="px-4 py-3 border-b border-base-300 text-xs text-base-content/60 font-medium">
                       {user?.email}
                     </div>
@@ -106,7 +106,7 @@ const Navigation: React.FC = () => {
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-4 py-2 text-sm font-semibold rounded-full bg-primary text-primary-content hover:shadow-lg transition-all"
+                  className="px-4 py-2 mr-2 text-sm font-semibold rounded-full bg-primary text-primary-content hover:shadow-lg transition-all"
                 >
                   Sign Up
                 </Link>
