@@ -4,7 +4,7 @@ export interface FeatureCardProps {
   desc: string;
 }
 
-export default function FeatureCard({ icon, title, desc }: FeatureCardProps) {
+export default function FeatureCard({ icon, title, desc }: Readonly<FeatureCardProps>) {
   return (
     <div className="p-6 rounded-xl bg-base-200 border border-base-300 shadow-md hover:shadow-lg transition-shadow duration-300">
       {icon && (

@@ -25,7 +25,7 @@ export default function Hero() {
           <div className="flex gap-4 flex-wrap items-center">
             <button
               className="inline-flex items-center justify-center px-6 py-3 font-semibold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap bg-primary text-primary-content hover:shadow-lg hover:scale-105 active:scale-95"
-              onClick={() => window.location.assign("/editor/create")}
+              onClick={() => globalThis.location.assign("/editor/create")}
             >
               Create New Design
             </button>

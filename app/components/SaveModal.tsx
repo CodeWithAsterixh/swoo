@@ -20,7 +20,7 @@ export default function SaveModal({
   status,
   statusMessage,
   projectId,
-}: SaveModalProps) {
+}: Readonly<SaveModalProps>) {
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -36,6 +36,13 @@ export default function SaveModal({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="save-design-title"
+      tabIndex={-1}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose();
+      }}
       style={{
         position: 'fixed',
         top: 0,

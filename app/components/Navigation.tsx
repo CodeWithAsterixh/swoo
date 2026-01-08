@@ -155,7 +155,19 @@ const Navigation: React.FC = () => {
                 </Link>
               ))}
 
-              {!isAuthenticated ? (
+              {isAuthenticated ? (
+                <div className="mt-2 w-full bg-base-100 border border-base-300 rounded-2xl shadow-xl overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-base-300 text-xs text-base-content/60 font-medium">
+                    {user?.email}
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50/50 transition-colors font-medium"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
                 <div className="flex gap-2 pt-3 border-t border-base-300/40">
                   <Link
                     href="/auth/login"
@@ -171,18 +183,6 @@ const Navigation: React.FC = () => {
                   >
                     Sign Up
                   </Link>
-                </div>
-              ) : (
-                <div className="mt-2 w-full bg-base-100 border border-base-300 rounded-2xl shadow-xl overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-base-300 text-xs text-base-content/60 font-medium">
-                    {user?.email}
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50/50 transition-colors font-medium"
-                  >
-                    Sign Out
-                  </button>
                 </div>
               )}
             </nav>

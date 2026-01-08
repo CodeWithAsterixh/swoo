@@ -36,21 +36,8 @@ export default function Footer() {
 
         {/* Social Icons */}
         <div className="flex gap-5">
-          {/* Twitter */}
-          <a href="#" aria-label="Twitter" className="group">
-            <svg
-              className="w-6 h-6 text-base-content/70 group-hover:text-primary transition-colors"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M22 4.01c-.77.35-1.6.59-2.47.7A4.13 4.13 0 0021.4 2.2a8.19 8.19 0 01-2.6 1A4.11 4.11 0 0012 6.13c0 .32.04.64.1.94A11.65 11.65 0 013 3.16a4.11 4.11 0 001.27 5.48c-.7-.02-1.36-.22-1.94-.54v.05a4.13 4.13 0 003.3 4.03c-.32.09-.66.14-1.01.14-.25 0-.48-.02-.71-.07a4.13 4.13 0 003.84 2.85A8.25 8.25 0 012 19.54a11.62 11.62 0 006.29 1.84c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.18 8.18 0 0022 4.01z" />
-            </svg>
-          </a>
-
           {/* GitHub */}
-          <a href="#" aria-label="GitHub" className="group">
+          <a href="https://github.com/CodeWithAsterixh" aria-label="GitHub" className="group">
             <svg
               className="w-6 h-6 text-base-content/70 group-hover:text-primary transition-colors"
               fill="currentColor"
@@ -60,16 +47,6 @@ export default function Footer() {
             </svg>
           </a>
 
-          {/* Discord */}
-          <a href="#" aria-label="Discord" className="group">
-            <svg
-              className="w-6 h-6 text-base-content/70 group-hover:text-primary transition-colors"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152..."/>
-            </svg>
-          </a>
         </div>
       </div>
 
