@@ -27,8 +27,8 @@ const FloatingBox: React.FC<FloatingBoxProps> = ({
 
   // Constrain position to stay within viewport
   const constrainPosition = useCallback((x: number, y: number) => {
-    const maxX = window.innerWidth - width;
-    const maxY = window.innerHeight - height;
+    const maxX = globalThis.innerWidth - width;
+    const maxY = globalThis.innerHeight - height;
     return {
       x: Math.max(0, Math.min(x, maxX)),
       y: Math.max(0, Math.min(y, maxY)),
@@ -62,11 +62,11 @@ const FloatingBox: React.FC<FloatingBoxProps> = ({
       setIsDragging(false);
     }
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    globalThis.addEventListener('mousemove', onMouseMove);
+    globalThis.addEventListener('mouseup', onMouseUp);
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      globalThis.removeEventListener('mousemove', onMouseMove);
+      globalThis.removeEventListener('mouseup', onMouseUp);
     };
   }, [isDragging, dragOffset, constrainPosition]);
 
